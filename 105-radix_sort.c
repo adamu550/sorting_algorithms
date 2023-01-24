@@ -14,6 +14,7 @@ void recursive_radix_sort(int *array, int *result, size_t size, int lsd)
 	int idx_end;
 	int i;
 	int index[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 	for (i = 0 ; i < (int)size ; i++)
 		index[(array[i] / lsd) % 10] += 1;
 	if (index[0] == (int)size)
