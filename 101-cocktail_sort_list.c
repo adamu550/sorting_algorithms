@@ -1,85 +1,66 @@
 #include "sort.h"
+#include <stdio.h>
+
 
 /**
- * cocktail_sort_list - Sort list
- * @list: list
+ * node_swap - swaps a node with the next node in the list
+ * @list: double pointer to the beginning of the list
+ * @aux: node to swap
  *
- * Return: Nothing
+ * Return: void
+ */
+void node_swap(listint_t **list, listint_t *aux)
+{
+	aux->next->prev = aux->prev;
+	if (!aux->prev)
+		*list = aux->next;
+	else
+		aux->prev->next = aux->next;
+	aux->prev = aux->next;
+	aux->next = aux->next->next;
+	aux->prev->next = aux;
+	if (aux->next)
+		aux->next->prev = aux;
+}
+/**
+ * cocktail_sort_list - sorts a doubly linked list of integers
+ * in ascending order using the Cocktail shaker sort algorithm
+ * @list: double pointer to the beginning of the list
+ *
+ * Return: void
  */
 void cocktail_sort_list(listint_t **list)
 {
-	listint_t *turtle = NULL;
-	listint_t *rabbit = NULL;
-	int left_limit = -1;
-	int right_limit = -1;
-	int count = 0, flag = 0;
+	int mark = 1;
+	listint_t *aux1;
 
-	if (!list || !(*list) || (!((*list)->prev) && !((*list)->next)))
+	if (list == NULL || *list == NULL)
 		return;
-	turtle = *list;
-	rabbit = (*list)->next;
-	while (left_limit <= right_limit)
+	aux1 = *list;
+	while (mark != 0)
 	{
-		left_limit++;
-		while (turtle && rabbit && count != right_limit)
+		mark = 0;
+		while (aux1->next)
 		{
-			if (turtle->n > rabbit->n)
-				swap_nodes(&turtle, &rabbit, list), print_list(*list), flag = 1;
-			turtle = turtle->next;
-			rabbit = rabbit->next;
-			count++;
+			if (aux1->next->n < aux1->n)
+			{
+				node_swap(list, aux1);
+				print_list(*list);
+				mark = 1;
+			}
+			else
+				aux1 = aux1->next;
 		}
-		if (left_limit == 0)
-			right_limit = count;
-		right_limit--;
-		turtle = turtle->prev;
-		rabbit = turtle->prev;
-		while (turtle && rabbit && count >= left_limit)
+		while (aux1->prev)
 		{
-			if (turtle->n < rabbit->n)
-				swap_nodes(&rabbit, &turtle, list), print_list(*list), flag = 1;
-			turtle = turtle->prev;
-			rabbit = rabbit->prev;
-			count--;
+			if (aux1->prev->n > aux1->n)
+			{
+				node_swap(list, aux1->prev);
+				print_list(*list);
+				mark = 1;
+			}
+			else
+				aux1 = aux1->prev;
 		}
-		if (flag == 0)
-			break;
-		flag = 0;
-		turtle = turtle->next;
-		rabbit = turtle->next;
 	}
-}
-
-/**
- * swap_nodes - Swap nodes
- * @turtle: List1
- * @rabbit: list2
- * @list: List
- *
- * Return: Nothing
- */
-void swap_nodes(listint_t **turtle, listint_t **rabbit, listint_t **list)
-{
-	listint_t *before;
-	listint_t *after;
-
-	if (!(*turtle) || !(*rabbit))
-		return;
-	before = (*turtle)->prev;
-	after = (*rabbit)->next;
-
-	if (before)
-		before->next = (*rabbit);
-	(*rabbit)->prev = before;
-	(*rabbit)->next = (*turtle);
-	(*turtle)->prev = (*rabbit);
-	(*turtle)->next = after;
-
-	if (after)
-		after->prev = (*turtle);
-	*turtle = *rabbit;
-	*rabbit = (*turtle)->next;
-
-	if (!before)
-		*list = *turtle;
 }
